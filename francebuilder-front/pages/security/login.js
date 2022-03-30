@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-import { isJwtTokenExpired, login, request } from '../../src/utils';
+import { isJwtTokenExpired, login, request } from '../../src/utils/utils';
 
 function Copyright (props) {
   return (
@@ -36,7 +36,9 @@ export default function SignIn () {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     login(data.get('username'), data.get('password'))
-    request("users", "GET").then(response => { console.log(response) })
+    setTimeout(() => {
+      request("userssss", "GET").then(response => { console.log(response) })
+    }, 1500);
   };
 
   return (

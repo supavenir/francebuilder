@@ -51,6 +51,16 @@ export async function customRequest(url, method, payload, _headers){
   }
 
   return fetch(`${config.serverUrl}/${url}`, httpConfig)
+    .then(status)
     .then((response) => response.json())
-    .catch((error) => console.error(error));
+    .catch((error) => {
+      throw error
+    });
+}
+
+function status (res) {
+  if (!res.ok) {
+    return Promise.reject()
+  }
+  return res;
 }

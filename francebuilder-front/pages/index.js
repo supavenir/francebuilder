@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Switch from '@mui/material/Switch'
 
-export default function Home() {
+export default function Home({ Component, id}) {
   return (
     <div className="container">
       <link

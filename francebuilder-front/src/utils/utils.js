@@ -1,10 +1,32 @@
 import jwtDecode from 'jwt-decode';
 import config from './config'
 
+export function appName(){
+  return config.appName
+}
+
+export function isEmpty(object){
+  return Object.keys(object).length === 0
+}
+
+export function getFormValue(formData, fieldName){
+  return formData.get(fieldName) != "" ? formData.get(fieldName) : null
+}
+
+export function redirectTo(url){
+  if (typeof document !== 'undefined') {
+    return document.location.href = url
+  }
+}
+
 export async function login(username, password){
-  customRequest("login", "POST", { username, password }).then(response => {
+  return customRequest("login", "POST", { username, password }).then(response => {
     saveJwtToken(response.token)
   });
+}
+
+export function getAuthenticatedUser(){
+  return request("security/me", "GET")
 }
 
 export function isJwtTokenExpired(){
@@ -12,16 +34,22 @@ export function isJwtTokenExpired(){
   return Date.now() >= expiredTime;
 }
 
-function saveJwtToken(token){
+export function jwtToken(){
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem(config.localJwtKey)
+  }
+}
+
+export function saveJwtToken(token){
   localStorage.setItem(config.localJwtKey, `Bearer ${token}`)
 }
 
 export function request(url, method, payload){
-  if(localStorage.getItem(config.localJwtKey)){
+  if(jwtToken()){
     return customRequest(url, method, payload, {
       'Accept': 'application/json, text/plain, */*',
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem(config.localJwtKey)
+      'Authorization': jwtToken()
     })
   }else{
     throw new Error("ANY_JWT_TOKEN")
@@ -29,15 +57,14 @@ export function request(url, method, payload){
 }
 
 function jwtContent(){
-  if (localStorage.getItem(config.localJwtKey)) {
-    return jwtDecode(localStorage.getItem(config.localJwtKey))
+  if (jwtToken()) {
+    return jwtDecode(jwtToken())
   } else {
     throw new Error("ANY_JWT_TOKEN")
   }
 }
 
 export async function customRequest(url, method, payload, _headers){
-
   let httpConfig = {
     method,
     headers: _headers ? _headers : {
@@ -51,16 +78,21 @@ export async function customRequest(url, method, payload, _headers){
   }
 
   return fetch(`${config.serverUrl}/${url}`, httpConfig)
-    .then(status)
     .then((response) => response.json())
+    .then((response) => {
+      if(response.status && response.status == 403){
+        customRequest("security/refresh-token", "GET").then(response => {
+          console.log(response.token);
+          saveJwtToken(response.token);
+        }).then(() => {
+          return customRequest(url, method, payload, _headers)
+        })
+      }else if(response.status){
+        throw response
+      }
+      return response
+    })
     .catch((error) => {
       throw error
     });
-}
-
-function status (res) {
-  if (!res.ok) {
-    return Promise.reject()
-  }
-  return res;
 }

@@ -6,7 +6,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -25,6 +28,9 @@ public class User implements UserDetails {
     @Column(name = "prenom")
     private String prenom;
 
+    @Column(name = "email")
+    private String email;
+
     @Column(name = "username")
     private String username;
 
@@ -40,6 +46,9 @@ public class User implements UserDetails {
     @Column(name = "nomEntreprise")
     private String nomEntreprise;
 
+    @Column(name = "roles")
+    private String roles;
+
     @Column(name = "accountNotExpired")
     private boolean accountNotExpired;
 
@@ -52,8 +61,23 @@ public class User implements UserDetails {
     @Column(name = "enabled")
     private boolean enabled;
 
+    @Column(name = "code_parrain")
+    private String codeParrain;
+
+    @OneToMany(mappedBy = "codeParrain")
+    private List<User> filleuls;
+
     public String getFullName() {
         return nom + " " + prenom;
+    }
+
+    public List<String> getRoles(){
+        return Arrays.asList(this.roles.split(";"));
+    }
+
+    public void addFilleul(User filleul){
+        if(this.filleuls == null) this.filleuls = new ArrayList<>();
+        this.filleuls.add(filleul);
     }
 
     @Override

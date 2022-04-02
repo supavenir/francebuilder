@@ -17,8 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
@@ -63,16 +62,21 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         User principal = (User) authResult.getPrincipal();
 
         // Create JWT Token
-        String token = JWT.create()
-                .withSubject(principal.getUsername())
-                .withClaim("meta", "coucou ça va ?")
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
-                .sign(HMAC512(JwtProperties.SECRET.getBytes()));
+        String token = generateJwtToken(principal);
 
         // Add token in response
         //response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + token);
         response.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         response.getOutputStream().print("{\"token\": \"" + token + "\"}");
         response.flushBuffer();
+    }
+
+    public static String generateJwtToken(User principal){
+        return JWT.create()
+                .withSubject(principal.getUsername())
+                .withClaim("ROLES", principal.getRoles())
+                .withClaim("USER", principal.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
+                .sign(HMAC512(JwtProperties.SECRET.getBytes()));
     }
 }

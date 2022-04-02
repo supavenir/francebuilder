@@ -1,5 +1,6 @@
 package com.thomasleconte.francebuilder.data.mapper;
 
+import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

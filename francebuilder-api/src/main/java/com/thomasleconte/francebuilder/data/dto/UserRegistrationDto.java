@@ -1,36 +1,23 @@
 package com.thomasleconte.francebuilder.data.dto;
 
 import lombok.Data;
-import lombok.ToString;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
 
 @Data
-@ToString
-public class UserDto {
-
-    @Nullable
-    private int id;
+public class UserRegistrationDto {
 
     @NotBlank
-    private String nom;
-
+    private String firstname;
     @NotBlank
-    private String prenom;
-
+    private String lastname;
     @NotBlank
     private String username;
-
     @NotBlank
-    private String numero;
-
+    private String email;
     @NotBlank
-    private String descriptif;
-
-    @NotBlank
-    private String nomEntreprise;
-
-    @NotBlank
+    private String password;
+    @Nullable
     private String codeParrain;
 }

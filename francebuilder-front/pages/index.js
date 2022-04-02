@@ -1,7 +1,24 @@
 import Head from 'next/head'
 import Switch from '@mui/material/Switch'
+import { useState } from 'react'
+import { appName, getAuthenticatedUser, isEmpty, isJwtTokenExpired, jwtToken } from '../src/utils/utils'
 
 export default function Home({ Component, id}) {
+
+  const [user, setUser] = useState({})
+
+  if(jwtToken() && !isJwtTokenExpired() && isEmpty(user)) {
+    getAuthenticatedUser().then(response => {
+      setUser(response)
+    })
+  }
+
+  const loginLink = () => {
+    return <a href="/security/login">{isEmpty(user) 
+      ? "Identifiez vous ici"
+      : "Bienvenue " + user.nom + " " + user.prenom + " (" + user.codeParrain + ")"}</a>
+  }
+
   return (
     <div className="container">
       <link
@@ -9,10 +26,8 @@ export default function Home({ Component, id}) {
         href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
       />
 
-      <Switch label="coucou" defaultChecked />
-
       <Head>
-        <title>Create Next App</title>
+        <title>{appName()} - Accueil</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -22,7 +37,7 @@ export default function Home({ Component, id}) {
         </h1>
 
         <p className="description">
-          Login <a href="/security/login">here !</a>
+          {loginLink()}
         </p>
 
         <p className="description">

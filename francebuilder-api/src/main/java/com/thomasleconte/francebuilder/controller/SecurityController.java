@@ -4,9 +4,13 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.thomasleconte.francebuilder.data.dto.TokenResponseDto;
+import com.thomasleconte.francebuilder.data.dto.UserDto;
+import com.thomasleconte.francebuilder.data.entity.User;
+import com.thomasleconte.francebuilder.data.mapper.UserMapper;
+import com.thomasleconte.francebuilder.security.JwtDecoder;
 import com.thomasleconte.francebuilder.security.JwtProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.thomasleconte.francebuilder.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,39 +32,42 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 public class SecurityController {
 
     private final HttpServletRequest httpServletRequest;
+    private final UserService userService;
+    private final UserMapper userMapper;
 
     @GetMapping("/refresh-token")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public TokenResponse refreshToken(){
+    public TokenResponseDto refreshToken(){
         try{
-
-            //TODO hydrater les roles
-
-
             String token = httpServletRequest.getHeader("Authorization").replace(JwtProperties.TOKEN_PREFIX, "");
             DecodedJWT decoder = JWT.require(HMAC512(JwtProperties.SECRET.getBytes()))
                     .build()
                     .verify(token);
-            JWTCreator.Builder builder = JWT.create();
+            User user = userService.loadUserByUsername(decoder.getSubject());
+
+            JWTCreator.Builder builder = JWT.create().withSubject(user.getUsername());
+
             for (Map.Entry<String, Claim> entry : decoder.getClaims().entrySet() ) {
                 builder = builder.withClaim(entry.getKey(), entry.getValue().asString());
             }
 
             Map<String, List<String>> payload = new HashMap<>();
-            List<String> roles = Arrays.asList("USER", "PARRAIN");
-            payload.put("ROLES", roles);
+            payload.put("ROLES", user.getRoles());
 
             builder = builder.withPayload(payload)
                     .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME));
-            return new TokenResponse(builder.sign(HMAC512(JwtProperties.SECRET.getBytes())));
+
+            return new TokenResponseDto(builder.sign(HMAC512(JwtProperties.SECRET.getBytes())));
         }catch (Exception e){
             throw e;
         }
     }
+
+    @GetMapping("/me")
+    public UserDto getProfile(){
+        String username = new JwtDecoder(httpServletRequest.getHeader("Authorization").replace(JwtProperties.TOKEN_PREFIX, ""))
+                .getUser();
+        return userMapper.toDestination(userService.loadUserByUsername(username));
+    }
 }
 
-@Data
-@AllArgsConstructor
-class TokenResponse {
-    private String token;
-}

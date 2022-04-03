@@ -1,21 +1,17 @@
 import * as React from 'react';
 import Head from 'next/head'
 import Image from 'next/image'
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-import { login, appName} from '../../src/utils/utils';
+import { login, appName, redirectTo } from '../../src/utils/utils';
 
 function Copyright (props) {
   return (
@@ -41,7 +37,7 @@ export default function SignIn () {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     login(data.get('username'), data.get('password')).then(() => {
-      document.location.href = "/"
+      redirectTo("/accueil")
     })
   };
 
@@ -52,7 +48,7 @@ export default function SignIn () {
         <title>{appName()} - Connexion</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div class="login-card">
+      <div className="login-card">
         <Container component="main" maxWidth="xs" sx={{paddingTop: 8}}>
           <CssBaseline />
           <Box
@@ -73,7 +69,7 @@ export default function SignIn () {
             <Typography component="h1" variant="h5" sx={{mt: 2}}>
               Connectez vous
             </Typography>
-            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
                 required
@@ -139,15 +135,12 @@ export default function SignIn () {
         }
 
         .login-card {
+          margin: 0 !important;
           height: 100vh;
           background-image: url("/background-login.jpg");
           background-size: cover;
           background-position: bottom;
           background-repeat: no-repeat;
-        }
-
-        .login-card {
-          margin: 0 !important;
         }
       `}</style>
 

@@ -5,11 +5,13 @@ import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.thomasleconte.francebuilder.data.dto.TokenResponseDto;
-import com.thomasleconte.francebuilder.data.dto.UserDto;
+import com.thomasleconte.francebuilder.data.dto.UserWithParrainagesDto;
 import com.thomasleconte.francebuilder.data.entity.User;
+import com.thomasleconte.francebuilder.data.mapper.ParrainnageMapper;
 import com.thomasleconte.francebuilder.data.mapper.UserMapper;
 import com.thomasleconte.francebuilder.security.JwtDecoder;
 import com.thomasleconte.francebuilder.security.JwtProperties;
+import com.thomasleconte.francebuilder.service.ParrainageService;
 import com.thomasleconte.francebuilder.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ public class SecurityController {
 
     private final HttpServletRequest httpServletRequest;
     private final UserService userService;
+    private final ParrainageService parrainageService;
     private final UserMapper userMapper;
 
     @GetMapping("/refresh-token")
@@ -64,10 +67,14 @@ public class SecurityController {
     }
 
     @GetMapping("/me")
-    public UserDto getProfile(){
+    public UserWithParrainagesDto getProfile(){
         String username = new JwtDecoder(httpServletRequest.getHeader("Authorization").replace(JwtProperties.TOKEN_PREFIX, ""))
                 .getUser();
-        return userMapper.toDestination(userService.loadUserByUsername(username));
+        User user = userService.loadUserByUsername(username);
+        UserWithParrainagesDto result = new UserWithParrainagesDto();
+        result.setUser(userMapper.toDestination(user));
+        result.setParrainages(parrainageService.getParrainagesOfUser(user));
+        return result;
     }
 }
 

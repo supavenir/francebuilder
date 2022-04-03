@@ -18,7 +18,7 @@ public class JwtDecoder {
     }
 
     public String getUser(){
-        return this.decoder.getClaim("USER").asString();
+        return this.decoder.getSubject();
     }
 
     public String getToken() {

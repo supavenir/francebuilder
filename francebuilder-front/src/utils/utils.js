@@ -25,6 +25,17 @@ export async function login(username, password){
   });
 }
 
+export function removeJwtToken(){
+  if (typeof window !== 'undefined') {
+    return window.localStorage.removeItem(config.localJwtKey)
+  }
+}
+
+export function logout(){
+  removeJwtToken()
+  redirectTo("/security/login")
+}
+
 export function getAuthenticatedUser(){
   return request("security/me", "GET")
 }

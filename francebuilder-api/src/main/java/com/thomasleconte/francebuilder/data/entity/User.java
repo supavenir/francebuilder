@@ -64,8 +64,12 @@ public class User implements UserDetails {
     @Column(name = "code_parrain")
     private String codeParrain;
 
-    @OneToMany(mappedBy = "codeParrain")
-    private List<User> filleuls;
+    @OneToMany(mappedBy = "parraineur", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Parrainnage> parrainnages;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name="parraineur_id")
+    private User parraineur;
 
     public String getFullName() {
         return nom + " " + prenom;
@@ -75,9 +79,9 @@ public class User implements UserDetails {
         return Arrays.asList(this.roles.split(";"));
     }
 
-    public void addFilleul(User filleul){
-        if(this.filleuls == null) this.filleuls = new ArrayList<>();
-        this.filleuls.add(filleul);
+    public void addParrainage(Parrainnage parrainnage){
+        if(this.parrainnages == null) this.parrainnages = new ArrayList<>();
+        this.parrainnages.add(parrainnage);
     }
 
     @Override

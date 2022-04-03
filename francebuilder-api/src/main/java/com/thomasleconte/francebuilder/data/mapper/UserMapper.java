@@ -6,6 +6,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(config = MapStructConfig.class, uses = {})
 public interface UserMapper extends BaseMapper<User, UserDto> {
+
     UserDto toDestination(User obj);
 
     User toSource(UserDto obj);

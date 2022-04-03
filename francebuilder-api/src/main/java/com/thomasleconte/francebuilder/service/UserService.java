@@ -2,14 +2,15 @@ package com.thomasleconte.francebuilder.service;
 
 import com.thomasleconte.francebuilder.data.dto.TokenResponseDto;
 import com.thomasleconte.francebuilder.data.dto.UserRegistrationDto;
+import com.thomasleconte.francebuilder.data.entity.Parrainnage;
 import com.thomasleconte.francebuilder.data.entity.User;
+import com.thomasleconte.francebuilder.data.repository.ParrainageRepository;
 import com.thomasleconte.francebuilder.data.repository.UserRepository;
 import com.thomasleconte.francebuilder.exception.EntityAlreadyExistsException;
 import com.thomasleconte.francebuilder.exception.EntityNotFoundException;
 import com.thomasleconte.francebuilder.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final ParrainageRepository parrainageRepository;
 
     public List<User> getUsers() {
         return userRepository.findAll();
@@ -66,19 +68,29 @@ public class UserService implements UserDetailsService {
         user.setDescriptif(null);
         user.setNomEntreprise(null);
         user.setNumero(null);
+        user = initUserSecurityContext(user);
 
+        user = userRepository.save(user);
+        if(parrain != null){
+            Parrainnage parrainnage = new Parrainnage();
+            parrainnage.setParraineur(parrain);
+            parrainnage.setFilleul(user);
+            parrain.addParrainage(parrainnage);
+            parrainageRepository.save(parrainnage);
+
+            user.setParraineur(parrain);
+            userRepository.save(user);
+        }
+
+        return new TokenResponseDto(JwtAuthenticationFilter.generateJwtToken(user));
+    }
+
+    private User initUserSecurityContext(User user){
         user.setRoles("SYMPATHISANT;");
         user.setEnabled(true);
         user.setAccountNotExpired(true);
         user.setAccountNotLocked(true);
         user.setCredentialNonExpired(true);
-
-        user = userRepository.save(user);
-        if(parrain != null){
-            parrain.addFilleul(user);
-            userRepository.save(parrain);
-        }
-
-        return new TokenResponseDto(JwtAuthenticationFilter.generateJwtToken(user));
+        return user;
     }
 }

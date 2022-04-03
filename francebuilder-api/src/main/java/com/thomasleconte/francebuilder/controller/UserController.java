@@ -1,5 +1,6 @@
 package com.thomasleconte.francebuilder.controller;
 
+import com.thomasleconte.francebuilder.data.dto.ParrainageDto;
 import com.thomasleconte.francebuilder.data.dto.TokenResponseDto;
 import com.thomasleconte.francebuilder.data.dto.UserRegistrationDto;
 import com.thomasleconte.francebuilder.data.entity.User;

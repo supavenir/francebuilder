@@ -5,6 +5,8 @@ import lombok.ToString;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 @Data
 @ToString
@@ -23,6 +25,9 @@ public class UserDto {
     private String username;
 
     @NotBlank
+    private String email;
+
+    @NotBlank
     private String numero;
 
     @NotBlank
@@ -33,4 +38,6 @@ public class UserDto {
 
     @NotBlank
     private String codeParrain;
+
+    private UserDto parraineur;
 }

@@ -15,7 +15,7 @@ export function getFormValue(formData, fieldName){
 
 export function redirectTo(url){
   if (typeof document !== 'undefined') {
-    return document.location.href = url
+    document.location.href = url
   }
 }
 
@@ -85,25 +85,28 @@ export async function customRequest(url, method, payload, _headers){
   }
 
   if(method !== 'GET'){
-    httpConfig.body = payload != null ? JSON.stringify(payload) : ""
+    if (payload != null) httpConfig.body = JSON.stringify(payload);
   }
 
   return fetch(`${config.serverUrl}/${url}`, httpConfig)
-    .then((response) => response.json())
     .then((response) => {
-      if(response.status && response.status == 403){
+      const contentType = response.headers.get("content-type");
+      return contentType && contentType.indexOf("application/json") !== -1 ? response.json() : response
+    }).then((response) => {
+
+      if(response.status == 403){
         customRequest("security/refresh-token", "GET").then(response => {
-          console.log(response.token);
           saveJwtToken(response.token);
         }).then(() => {
           return customRequest(url, method, payload, _headers)
         })
-      }else if(response.status){
+      }else if(response.ok != undefined && response.ok == false){
         throw response
+      }else{
+        return response
       }
-      return response
     })
-    .catch((error) => {
+    .catch(error => {
       throw error
     });
 }

@@ -4,13 +4,40 @@ import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { isEmpty, logout } from "../../src/utils/utils";
+import { logout } from "../../src/utils/utils";
 
 export default class Navbar extends Component {
 
+  state = {
+    user: null,
+    parrainages: null
+  }
+
+  constructor(props) {
+    super(props);
+    if(this.props.user){
+      this.state = {
+        // user: this.props.user.user.nom + " " + this.props.user.user.prenom + "( " + this.props.user.user.codeParrain + " )",
+        user: this.props.user.user,
+        parrainages: this.props.user.parrainages
+      }
+    }
+  }
+
   username = () => {
-    const user = this.props.user
-    return user.user.nom + " " + user.user.prenom + " (" + user.user.codeParrain + ")";
+    if(this.state.user){
+      return this.state.user.nom + " " + this.state.user.prenom + " (" + this.state.user.codeParrain + " )"
+    }
+  }
+
+  navItems = () => {
+    const result = [];
+    result.push({ key: 1, label: "Accueil", href: "/accueil" });
+    result.push({ key: 3, label: "Dons", href: "/don" });
+    if (this.state.parrainages != undefined && this.state.parrainages.length > 0) {
+      result.push({ key: 4, label: "Parrainages", href: "/parrainages" });
+    }
+    return result;
   }
 
   logout = (e) => {
@@ -35,8 +62,7 @@ export default class Navbar extends Component {
         </div>
 
         <div className="right">
-          
-          {this.props.items.map((item) => (
+          {this.navItems().map((item) => (
             <Link key={item.key} href={item.href}><a className="nav-item">{item.label}</a></Link>
           ))}
           <IconButton
@@ -50,7 +76,7 @@ export default class Navbar extends Component {
             </Badge>
           </IconButton>
           <p className="description">
-            {isEmpty(this.props.user)
+            {this.state.user == null
               ? <Link href="/security/login"><a>Connexion</a></Link>
               : <Link href=""><a onClick={(e) => logout(e)}>{this.username()}</a></Link>
             }

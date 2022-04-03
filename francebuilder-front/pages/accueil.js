@@ -1,13 +1,6 @@
 import Head from 'next/head'
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { useState } from 'react'
-import { appName, getAuthenticatedUser, isEmpty, jwtToken } from '../src/utils/utils'
-import ConversationItem from './components/ConversationItem';
-import Banner from './components/Banner';
+import { appName } from '../src/utils/utils'
 import { ArticleItem } from './components/ArticleItem';
-import Navbar from './components/Navbar';
-import jwtDecode from 'jwt-decode';
 import ComponentTitle from './components/ComponentTitle';
 
 export default function Accueil ({ Component, id }) {

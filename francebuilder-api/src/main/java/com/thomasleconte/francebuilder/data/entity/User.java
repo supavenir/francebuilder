@@ -67,6 +67,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "parraineur", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Parrainnage> parrainnages;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Don> dons;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="parraineur_id")
     private User parraineur;

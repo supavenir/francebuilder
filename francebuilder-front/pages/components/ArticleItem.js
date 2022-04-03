@@ -12,7 +12,7 @@ export class ArticleItem extends Component {
           <Image src={this.props.image} width="100px" height="100px" />
         </div>
         <div className="content">
-          <Typography component="h3" variant="h5">
+          <Typography component="h4" variant="h5">
             {this.props.title}
           </Typography>
           <div className="date">{this.props.date}</div>

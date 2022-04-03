@@ -17,6 +17,12 @@ public class JwtDecoder {
                 .verify(token);
     }
 
+    public static String getUser(String token){
+        return JWT.require(HMAC512(JwtProperties.SECRET.getBytes()))
+                .build()
+                .verify(token).getSubject();
+    }
+
     public String getUser(){
         return this.decoder.getSubject();
     }
